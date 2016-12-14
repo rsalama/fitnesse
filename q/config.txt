@@ -1,0 +1,20 @@
+###################################
+# Side A Gateway factory 2
+###################################
+StartConfig
+  mskey  = :${SIDE_A_GATEWAY}:${PORT}
+  skey   = :${SIDE_A_GATEWAY}:6200
+  port   = 6200
+  stype  = gwf
+  grpID  = gwf
+  script = ${KDBSFROOT}/GatewayFactory.q
+  args   = -ss SSF.csv                        
+           -ul ${NFSROOT}/sf_usage/ul     
+           -statsdir ${NFSROOT}/sf_statistics/  
+           -sp ${CONFIGROOT}/storedProcs       
+           -gw ${KDBSFROOT}/BaseGateway.q     
+           -lr ${NFSROOT}/sf_logs/gw           
+           -gc 32                              
+           -logbasename ${NFSROOT}/sf_logs/gwf_roll_${SIDE_A_GATEWAY}_6200_
+  logdir = ${NFSROOT}/sf_logs/gwf_stdout_
+EndConfig

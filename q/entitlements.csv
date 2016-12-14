@@ -1,0 +1,3 @@
+entitlement,usergroup,actiongroup,resourcegroup
+all,timeseries_team,user_actions,test_resources
+all,testusers,user_actions,test_resources

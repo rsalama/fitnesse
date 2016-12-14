@@ -1,0 +1,52 @@
+reutersE:([] vd:`date$(); id:`symbol$(); rawca_thic:`float$(); rawcb_thic:`float$())
+
+n:1000
+/ .ds.ds_price:([] date:(2010.01.02 + til n); id:(n#`$"EUN.VX"); rawca_thic:(n?100.0); rawcb_thic:(n?100.0))
+
+tckrs:(`$"EUN.VX";`$"IBM.N";`$"MS.N";`$"ORCL.N";`$"INTC.N")
+.ds.ds_price: `date xasc raze {([] date:((.z.D-n) + til n); id:(n#x); rawca_thic:(n?100.0); rawcb_thic:(n?100.0))} @' tckrs
+
+/
+Date 	1 mo 	3 mo 	6 mo 	1 yr 	2 yr 	3 yr 	5 yr 	7 yr 	10 yr 	20 yr 	30 yr
+
+05/03/10 	0.14 	0.17 	0.25 	0.43 	1.00 	1.56 	2.47 	3.16 	3.72 	4.37 	4.53
+05/04/10 	0.15 	0.16 	0.24 	0.43 	0.96 	1.49 	2.38 	3.07 	3.63 	4.27 	4.43
+05/05/10 	0.14 	0.15 	0.22 	0.39 	0.88 	1.43 	2.31 	3.00 	3.58 	4.23 	4.39
+05/06/10 	0.06 	0.11 	0.16 	0.34 	0.75 	1.27 	2.13 	2.83 	3.41 	4.03 	4.19
+05/07/10 	0.08 	0.13 	0.21 	0.38 	0.83 	1.32 	2.17 	2.87 	3.45 	4.11 	4.28
+\
+
+getYldCurve:{
+  ustreas: "http://www.ustreas.gov/offices/domestic-finance/debt-management/interest-rate/yield_historical.xml";
+  dt:(`MONTH`YEAR)!(1 3 6; 1 2 3 5 7 10 20 30);
+  mktag:{[x;y] "<BC_",(string y),(string x),">"};
+  tags: raze (key dt) {[m;x;y] {[m;x;y] raze m[x;y]}[m;x;] @'  y}[mktag] ' (value dt);
+  wcget: "wget -q -O - ", ustreas;
+  grep: "egrep ", "\"", ("|" sv tags), "|BC_CAT|NEW_DATE", "\"";
+  sed: "sed -e '/BC_/s/BC_//g' -e '/NEW_DATE/s/NEW_//g' -e '/<.*G_DATE>/d' -e '/<.*G_CAT>/d' -e '/MONTH/s/MONTH/_MON/g' -e '/YEAR/s/YEAR/_YR/g' ";
+  xml: trim system (wcget,"|",grep, "|", sed);
+  inds: {where (x="<") or x=">"} @' xml;
+  c:(count xml) div  r:count where xml like "*DATE*";
+  rng:{[a;i;j] (a[i]+1) + til a[j]-a[i]+1};
+  f: {(enlist lower `$x[0])!(enlist $["DATE"~x[0];"D"$x[1];"F"$x[1]])};
+  m: xml {[rng;x;i] (x rng[i;0;1]; x rng[i;1;2])}[rng] ' inds;
+  m: (r;c) # m;
+  m: {[f;x] raze f @' x}[f;] @' m;
+  m: `date xasc `date xcols m;
+  select from m where not date=0N
+  }
+
+/ Compute discount factors
+/ rs: rate vector; ts: term vector
+dcf:{[rs;ts] rs {[r;t] (1+r) xexp neg t}' ts }
+
+/ b:(`cpn`mat`par)!(0.05;2012.12.31;100)
+/ Assumes 30/360 calendar cpn paid twice yearly
+prc:{[b;r;d] 
+  ts: 1+til (b[`mat]-d) div 30*6;
+  rs: (count ts)#r;
+  (b[`par] * last d) + sum (b[`cpn]%2) * d:dcf[rs;ts]
+  }
+
+prc2:{[b;r;d] (b[`par] * last d) + sum (b[`cpn]%2) * d:dcf[(count ts)#r; ts: 1+til (b[`mat]-d) div 30*6] }
+
