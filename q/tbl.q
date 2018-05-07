@@ -15,3 +15,4 @@ cnv:(`vd`id`cp`op)!(`toDate;`toSymbol;`toInt;`toReal)
 `vd`id xkey ![vv;();0b;(cols vv)!{(cnv x;x)} each cols vv]
 
 / ![vv;();0b;`vd`id`cp`op!((`toDate;`vd);(`toSymbol;`id);(`toInt;`cp);(`toReal;`op))];
+((=).'')t,''u
