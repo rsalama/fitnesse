@@ -1,6 +1,7 @@
 qscript_path:"/home/rs/q:/home/rs/tmp"
 .sp.path:hsym `$":" vs qscript_path
 .sp.fnd:{[sp;f] first sp where f in' key each sp}
+.sp.fnd:{[sp;f] first sp where ('[in[f];key])'[sp]}
 .sp.ld:{[f] system "l ", 0N!1_string $[not null p:.sp.fnd[.sp.path;f];` sv (p;f);'"FileNotFound:",string f]}
 
 / 
