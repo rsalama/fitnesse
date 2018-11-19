@@ -1,0 +1,8 @@
+/bin/
+/FitNesseRoot/
+/project/
+/project.ORID/
+/target/
+/.cache-main
+/build.sbt.ORIG
+/build.sbt~

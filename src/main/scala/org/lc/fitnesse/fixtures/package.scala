@@ -1,8 +1,8 @@
-package com.fitnesse
+package org.lc.fitnesse
 
 import scala.util._
 import java.net.ServerSocket
-import kx.K.Dict
+import kx.c.Dict
 import scala.reflect._
 import com.typesafe.scalalogging.LazyLogging
 import java.sql.Timestamp
@@ -12,17 +12,17 @@ import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.DateTimeFormatterBuilder
 import java.text.SimpleDateFormat
 
-package object fitnesse {
+package object fixtures {
   trait Logger extends LazyLogging
 
   implicit class RichMap[K, V](m: Map[K, V]) {
     def apply(ks: Seq[K]): Seq[V] = ks.collect { case k if (m.contains(k)) => m(k) }
     def take(ks: Seq[K]): Map[K, V] = ks.collect { case k if (m.contains(k)) => (k -> m(k)) } toMap
     def drop(ks: Seq[K]): Map[K, V] = take(m.keys.filterNot(ks.toSet).toSeq)
-    def toDict: kx.K.Dict = new kx.K.Dict(m.keys.toArray(classTag[Any]), m.values.toArray(classTag[Any]))
+    def toDict: kx.c.Dict = new kx.c.Dict(m.keys.toArray(classTag[Any]), m.values.toArray(classTag[Any]))
   }
 
-  implicit class RichDict(d: kx.K.Dict) {
+  implicit class RichDict(d: kx.c.Dict) {
     def toMap[K, V] = (d.x.asInstanceOf[Array[K]] zip d.y.asInstanceOf[Array[V]]) toMap
     def size: Int = d.x.asInstanceOf[Array[_]].length
     def isEmpty: Boolean = size == 0
@@ -31,20 +31,20 @@ package object fitnesse {
 
   object Month {
     // 2000.01m
-    def valueOf(s: String) = new kx.K.Month(s.take(4).toInt - 2000 + s.drop(5).take(2).toInt)
+    def valueOf(s: String) = new kx.c.Month(s.take(4).toInt - 2000 + s.drop(5).take(2).toInt)
   }
 
   object Dict {
-    def apply(x: Array[_], y: Array[_]) = new kx.K.Dict(x, y)
+    def apply(x: Array[_], y: Array[_]) = new kx.c.Dict(x, y)
   }
 
   val stringOf: Any => String = { o =>
     o match {
       case s: Array[Char]         => s.mkString
       case a: Array[_]            => a.collect { case x => stringOf(x) } mkString ("(", ";", ")")
-      case d: kx.K.Dict           => d.x.asInstanceOf[Array[_]].mkString("`", "`", "!") + stringOf(d.y)
+      case d: kx.c.Dict           => d.x.asInstanceOf[Array[_]].mkString("`", "`", "!") + stringOf(d.y)
       case m: Map[_, _]           => m.collect { case e => s"(${e._1} -> ${stringOf(e._2)})" } mkString ("(", ", ", ")")
-      case t: kx.K.Flip           => kx.Dumper.toString(t)
+      case t: kx.c.Flip           => kx.Dumper.toString(t)
       case _                      => if (o == null) "NULL" else o.toString
     }
   }
@@ -79,7 +79,7 @@ package object fitnesse {
 
   implicit def toMap[K, V](o: Object): Map[K, V] = {
     o match {
-      case d: kx.K.Dict => (d.x.asInstanceOf[Array[K]] zip d.y.asInstanceOf[Array[V]]) toMap
+      case d: kx.c.Dict => (d.x.asInstanceOf[Array[K]] zip d.y.asInstanceOf[Array[V]]) toMap
       case _            => throw new IllegalArgumentException(s"$o is not a Dict, it is a ${o.getClass.getName}")
     }
   }
@@ -121,22 +121,22 @@ package object fitnesse {
 
   // Basic types
   var qtypes: Map[String, QType] = Map(
-    ("*" -> QType(10, (a => a.trim.toCharArray), kx.K.NULL(10))),
-    ("b" -> QType(-1, (b => b.trim.toBoolean), kx.K.NULL(1))),
-    ("g" -> QType(-2, (g => java.util.UUID.fromString(g.trim)), kx.K.NULL(2))),
-    ("x" -> QType(-4, (x => x.trim.toByte), kx.K.NULL(4))),
-    ("h" -> QType(-5, (h => h.trim.toShort), kx.K.NULL(5))),
-    ("i" -> QType(-6, (i => i.trim.toInt), kx.K.NULL(6))),
-    ("j" -> QType(-7, (j => j.trim.toLong), kx.K.NULL(7))),
-    ("e" -> QType(-8, (e => e.trim.toFloat), kx.K.NULL(8))),
-    ("f" -> QType(-9, (f => f.trim.toDouble), kx.K.NULL(9))),
-    ("c" -> QType(-10, (c => c.trim.head), kx.K.NULL(10))),
-    ("s" -> QType(-11, (s => s.trim), kx.K.NULL(11))),
-    ("p" -> QType(-12, (p => Timestamp.valueOf(p.trim)), kx.K.NULL(12))),
-    ("m" -> QType(-13, (m => Month.valueOf(m.trim)), kx.K.NULL(13))),
-    ("d" -> QType(-14, (d => DateTime.parse(d.trim, dateFormatter).toDate), kx.K.NULL(14))),
-    ("z" -> QType(-16, (z => Timestamp.parse(z.trim, datetimeFormatter)), kx.K.NULL(16))),
-    ("t" -> QType(-19, (t => java.sql.Time.valueOf(t.trim)), kx.K.NULL(19))))
+    ("*" -> QType(10, (a => a.trim.toCharArray), kx.c.NULL(10))),
+    ("b" -> QType(-1, (b => b.trim.toBoolean), kx.c.NULL(1))),
+    ("g" -> QType(-2, (g => java.util.UUID.fromString(g.trim)), kx.c.NULL(2))),
+    ("x" -> QType(-4, (x => x.trim.toByte), kx.c.NULL(4))),
+    ("h" -> QType(-5, (h => h.trim.toShort), kx.c.NULL(5))),
+    ("i" -> QType(-6, (i => i.trim.toInt), kx.c.NULL(6))),
+    ("j" -> QType(-7, (j => j.trim.toLong), kx.c.NULL(7))),
+    ("e" -> QType(-8, (e => e.trim.toFloat), kx.c.NULL(8))),
+    ("f" -> QType(-9, (f => f.trim.toDouble), kx.c.NULL(9))),
+    ("c" -> QType(-10, (c => c.trim.head), kx.c.NULL(10))),
+    ("s" -> QType(-11, (s => s.trim), kx.c.NULL(11))),
+    ("p" -> QType(-12, (p => Timestamp.valueOf(p.trim)), kx.c.NULL(12))),
+    ("m" -> QType(-13, (m => Month.valueOf(m.trim)), kx.c.NULL(13))),
+    ("d" -> QType(-14, (d => DateTime.parse(d.trim, dateFormatter).toDate), kx.c.NULL(14))),
+    ("z" -> QType(-16, (z => Timestamp.parse(z.trim, datetimeFormatter)), kx.c.NULL(16))),
+    ("t" -> QType(-19, (t => java.sql.Time.valueOf(t.trim)), kx.c.NULL(19))))
 
   // Upper case -- collection types
   qtypes = qtypes ++ qtypes.collect {
@@ -145,9 +145,9 @@ package object fitnesse {
 
   // Overrides
   qtypes = qtypes ++ Map(
-    ("C" -> QType(10, (s => if (s.contains(",")) s.split(",").map(x => x.trim.head) else s.toCharArray), Array(kx.K.NULL(10)))))
-  //("s" -> QType(-11, (s => s.trim), kx.K.NULL(11))),
-  //("S" -> QType(11, (s => s.split(",").map(x => x.trim)), Array(kx.K.NULL(11)))))
+    ("C" -> QType(10, (s => if (s.contains(",")) s.split(",").map(x => x.trim.head) else s.toCharArray), Array(kx.c.NULL(10)))))
+  //("s" -> QType(-11, (s => s.trim), kx.c.NULL(11))),
+  //("S" -> QType(11, (s => s.split(",").map(x => x.trim)), Array(kx.c.NULL(11)))))
 
   val toQ: String => String => Any = t => s => qtypes(t)(s)
   

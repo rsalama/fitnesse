@@ -1,4 +1,4 @@
-package com.fitnesse.fixtures
+package org.lc.fitnesse.fixtures
 
 import scala.util.{ Try, Failure, Success }
 import scala.sys.process._
@@ -70,7 +70,8 @@ class KDBGenericFixture(sreInstance: String, repo: String, script: String, env: 
       case "1" => s"screen -S fitnesse-${n} -d -m "
       case _   => ""
     }
-    val cmd = s"${screen}/home/rsalama/bin/runfitnesse.sh /home/rsalama/q/$script -e $E -c $c -p $port"
+    // val cmd = s"${screen}/home/rsalama/bin/runfitnesse.sh /home/rsalama/q/$script -e $E -c $c -p $port"
+    val cmd = s"q -e $E -c $c -p $port"
     qprocess = Some(cmd.run(ProcessLogger(line => logger.info(s"<<< q: $line"))))
     logger.info(s"Started: $cmd")
     Thread.sleep(200)

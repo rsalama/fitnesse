@@ -1,8 +1,17 @@
-name := "ScalaJavaInterop"
+organization := "org.lc"
+
+name := "fitnesse"
 
 version := "1.0"
 
 scalaVersion := "2.12.2"
+
+// enablePlugins(JavaServerAppPackaging)
+enablePlugins(JavaAppPackaging)
+// enablePlugins(UniversalPlugin)
+
+mainClass in Compile := Some("fitnesseMain.FitNesseMain")
+
 /*
 libraryDependencies ++= Seq(
   // "org.scalaz"    %% "scalaz-core"       % "7.1.0",

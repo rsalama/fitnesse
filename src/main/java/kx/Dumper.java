@@ -8,7 +8,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Map;
 
-import kx.K.Flip;
+import kx.c.Flip;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -45,19 +45,19 @@ public class Dumper
     
     public static void dump(Object obj, Writer wr) throws Exception
     {
-        if (obj instanceof K.Dict)
-            dump((K.Dict) obj, wr, rowLimit, colLimit);
-        else if (obj instanceof K.Flip)
+        if (obj instanceof kx.c.Dict)
+            dump((kx.c.Dict) obj, wr, rowLimit, colLimit);
+        else if (obj instanceof kx.c.Flip)
         {
-            dump( ((K.Flip) obj).toTable(), wr, rowLimit, colLimit );
+            dump( ((kx.c.Flip) obj).toTable(), wr, rowLimit, colLimit );
         }
-        else if (obj instanceof K.Table)
+        else if (obj instanceof kx.c.Table)
         {
-            dump( (K.Table) obj, wr, rowLimit, colLimit);
+            dump( (kx.c.Table) obj, wr, rowLimit, colLimit);
         }
         else if (obj.getClass().isArray())
         {
-            Object[] arr = K.autoboxArray(obj);
+            Object[] arr = kx.c.autoboxArray(obj);
             if(colLimit < arr.length)
             {
                 arr = Arrays.copyOf(arr, colLimit + 1);
@@ -71,13 +71,13 @@ public class Dumper
         }
     }
 
-    private static void dump(K.Dict d, Writer wr, int rowLimit, int colLimit) throws Exception
+    private static void dump(kx.c.Dict d, Writer wr, int rowLimit, int colLimit) throws Exception
     {
-        if (d.x instanceof K.Flip && d.y instanceof K.Flip)
+        if (d.x instanceof kx.c.Flip && d.y instanceof kx.c.Flip)
         {
             // Keyed table
-            K.Flip fx = (K.Flip) d.x;
-            K.Flip fy = (K.Flip) d.y;
+        	kx.c.Flip fx = (kx.c.Flip) d.x;
+        	kx.c.Flip fy = (kx.c.Flip) d.y;
 
             int colWidth[] = new int[colLimit];
 
@@ -152,7 +152,7 @@ public class Dumper
             }
             for (Map.Entry<Object, Object> e : m.entrySet())
             {
-                if (e.getValue() instanceof K.Flip || e.getValue() instanceof K.Dict)
+                if (e.getValue() instanceof kx.c.Flip || e.getValue() instanceof kx.c.Dict)
                 {
                     wr.write(e.getKey() + ":\n");
                     dump(e.getValue(), wr);
@@ -167,7 +167,7 @@ public class Dumper
         }
     }
 
-    private static void dump(K.Table table, Writer wr, int rowLimit, int colLimit) throws Exception
+    private static void dump(kx.c.Table table, Writer wr, int rowLimit, int colLimit) throws Exception
     {
         int colWidth[] = new int[table.columns.size()];
         
@@ -213,7 +213,7 @@ public class Dumper
         end (wr, rowCount > rowLimit);
     }
 
-    private static String dump(K.Flip f, Writer wr, int rowLimit, int colLimit) throws Exception
+    private static String dump(kx.c.Flip f, Writer wr, int rowLimit, int colLimit) throws Exception
     {
         int colWidth[] = new int[colLimit];
 
@@ -288,7 +288,7 @@ public class Dumper
      * @param fy
      * @return
      */
-    private static int findRowcount(Flip fx, Flip fy)
+    private static int findRowcount(kx.c.Flip fx, kx.c.Flip fy)
     {
         return Math.min(findRowcount(fx), findRowcount(fy));
     }
@@ -325,7 +325,7 @@ public class Dumper
         wr.write(String.format(fmt, msg));
     }
 
-    private static int getRowCount(K.Flip f, int idx)
+    private static int getRowCount(kx.c.Flip f, int idx)
     {
         int rowCount = 1;
 
@@ -337,7 +337,7 @@ public class Dumper
         return rowCount;
     }
 
-    private static int calcColWidth(K.Flip f, int colIdx, int rowLimit)
+    private static int calcColWidth(kx.c.Flip f, int colIdx, int rowLimit)
     {
         int colWidth = f.x[colIdx].length();
 
@@ -353,7 +353,7 @@ public class Dumper
 
     private static String colRow2Text(Object col, int ri)
     {
-        Object[] arr = K.autoboxArray(col);
+        Object[] arr = kx.c.autoboxArray(col);
         try
         {
             return arr[ri].toString();

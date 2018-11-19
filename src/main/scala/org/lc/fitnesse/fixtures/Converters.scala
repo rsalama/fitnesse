@@ -1,4 +1,4 @@
-package com.fitnesse.fixtures
+package org.lc.fitnesse.fixtures
 
 import fitnesse.slim.{ Converter => FitConverter, SlimError }
 import java.text.SimpleDateFormat
