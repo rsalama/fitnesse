@@ -4,7 +4,7 @@ name := "fitnesse"
 
 version := "1.0"
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.8"
 
 // enablePlugins(JavaServerAppPackaging)
 enablePlugins(JavaAppPackaging)
@@ -35,22 +35,23 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.joda"      %  "joda-convert"      % "1.2",
-  "joda-time"     %  "joda-time"         % "2.1",
   "com.github.nscala-time" %% "nscala-time" % "2.20.0",
   "org.mongodb"   %  "mongo-java-driver" % "2.7.2",
   "org.typelevel" %% "cats-effect"       % "0.5",
   "co.fs2"        %% "fs2-core"          % "0.9.7",
   "co.fs2"        %% "fs2-io"            % "0.9.7",
-  "com.lihaoyi"   %% "ammonite"          % "1.0.3" % "test" cross CrossVersion.full,
+  // "com.lihaoyi"   %% "ammonite"          % "1.0.3" % "test" cross CrossVersion.full, 
   "commons-lang"  %  "commons-lang"      % "2.6",
   "com.typesafe.akka" %% "akka-actor"    % "2.5.11",
   "com.typesafe.akka" %% "akka-testkit"  % "2.5.11" % Test,
-  "org.fitnesse"  % "fitnesse"           % "20180127",
+  "org.fitnesse"  % "fitnesse"           % "20190409",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
   "ch.qos.logback" % "logback-classic"   % "1.2.3",
   "org.scalactic" %% "scalactic"         % "3.0.5",
   "org.scalatest" %% "scalatest"         % "3.0.5" % "test"
 )
+
+/*
 
 libraryDependencies += "com.lihaoyi"   %% "ammonite"          % "1.0.3" % "test" cross CrossVersion.full
 
@@ -60,3 +61,5 @@ sourceGenerators in Test += Def.task {
   IO.write(file, """object amm extends App { ammonite.Main.main(args) }""")
   Seq(file)
 }.taskValue
+
+ */

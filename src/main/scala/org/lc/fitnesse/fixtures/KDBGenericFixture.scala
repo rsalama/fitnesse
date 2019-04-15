@@ -1,17 +1,15 @@
 package org.lc.fitnesse.fixtures
 
 import scala.util.{ Try, Failure, Success }
-import scala.sys.process._
 import java.net.InetAddress
 
-class KDBGenericFixture(sreInstance: String, repo: String, script: String, env: String, qver: String, E: String = "1") extends Logger {
+class KDBGenericFixture(sreInstance: String, repo: String, script: String, env: String, qver: String, E: String = "1") extends Logger with HasQProcess {
   private val c = "25 1000"
   // private val e = (Map(("DEV" -> "1"), ("QA" -> "1")) withDefaultValue ("0"))(env)
   private val reserved = "name" :: "msgs" :: "feval" :: "fpass" :: Nil
   private val resultKeys = "pass" :: "result" :: Nil
   private var k: kx.c = _
   private var fixtureValues: Map[String, Any] = Map.empty
-  private var qprocess: Option[Process] = None
 
   def set(fld: String, value: Any) = {
     logger.info(s"set($fld, ${stringOf(value)})")
@@ -46,14 +44,13 @@ class KDBGenericFixture(sreInstance: String, repo: String, script: String, env: 
           resultKeys map (k => (k, e))
       }
       _ = set(r._1, r._2)
-    } 
-    fixtureValues.get("pass") collect {case e: Throwable => throw(e) }
+    } fixtureValues.get("pass") collect {case e: Throwable => throw(e) }
     logger.trace("<<< execute")
   }
 
-  def get(k: String) = {
+  def get(k: String): Any = {
     val a = fixtureValues(k) match {
-      case d: kx.c.Dict => d.toMap()
+      case d: kx.c.Dict => d.toMap
       case r @ _        => r
     }
     logger.info(s"get($k) ${stringOf(a)} (${className(a)})")
@@ -64,17 +61,8 @@ class KDBGenericFixture(sreInstance: String, repo: String, script: String, env: 
     logger.trace(">>> beginTable")
     val host = InetAddress.getLocalHost
     val port = getFreePort
-    val n = sys.props.getOrElse("user.name", "Generic.Fixture")
-    ///home/rsalama/uhdbdev/sre_deploy/utilities/release/bin/start_sreinstance.sh --repo utilities --script vdb_central/vdb_central.q --interactive --env DEV -q 35 -m 35000
-    val screen = E match {
-      case "1" => s"screen -S fitnesse-${n} -d -m "
-      case _   => ""
-    }
-    // val cmd = s"${screen}/home/rsalama/bin/runfitnesse.sh /home/rsalama/q/$script -e $E -c $c -p $port"
-    val cmd = s"q -e $E -c $c -p $port"
-    qprocess = Some(cmd.run(ProcessLogger(line => logger.info(s"<<< q: $line"))))
-    logger.info(s"Started: $cmd")
-    Thread.sleep(200)
+
+    startQProcess(E, c, port)
 
     k = new kx.c(host.getHostAddress, port)
     logger.info(s"Connected to ${host.getHostName}::$port: $k")
@@ -93,8 +81,7 @@ class KDBGenericFixture(sreInstance: String, repo: String, script: String, env: 
       case "0" => Try(k.k("exit[0]")) recoverWith { case _ => Success("exit") }
       case _   =>
     }
-    qprocess.map(p => p.destroy)
-    qprocess = None
+    endQProcess()
     logger.trace("<<< endTable...")
   }
 
